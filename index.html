@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Interview Lab — Start</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a href="index.html" class="topbar__brand">Interview Lab</a>
+      <span class="topbar__meta">Practice &amp; online tests</span>
+    </header>
+
+    <main class="main">
+      <div class="wrap">
+        <div class="card">
+          <div class="card__lead">
+            <div class="card__icon" aria-hidden="true">✦</div>
+            <div>
+              <h1>AI Interview Practice</h1>
+              <p class="sub">
+                Enter your details, pick a topic, and take a timed multiple-choice test.
+              </p>
+            </div>
+          </div>
+
+          <form id="login-form">
+            <label for="name">Full name</label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              autocomplete="name"
+              required
+              placeholder="e.g. Alex Kumar"
+            />
+
+            <label for="regNo">Register number</label>
+            <input
+              type="text"
+              id="regNo"
+              name="regNo"
+              required
+              placeholder="e.g. 21CS001"
+            />
+
+            <label for="category">Category</label>
+            <select id="category" name="category" required>
+              <option value="HTML">HTML</option>
+              <option value="CSS">CSS</option>
+              <option value="JavaScript">JavaScript</option>
+              <option value="Aptitude">Aptitude</option>
+            </select>
+
+            <button type="submit" class="btn">Start test</button>
+          </form>
+
+          <div class="nav-links">
+            <a class="link-quiet" href="dashboard.html">Teacher dashboard →</a>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="site-footer">AI-based interview practice &amp; online test system</footer>
+
+    <script src="js/login.js"></script>
+  </body>
+</html>

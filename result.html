@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Interview Lab — Results</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a href="index.html" class="topbar__brand">Interview Lab</a>
+      <span class="topbar__meta">Results</span>
+    </header>
+
+    <main class="main">
+      <div class="wrap">
+        <div class="card">
+          <h1>Test complete</h1>
+          <p class="sub">Here is how you did.</p>
+
+          <div class="score-wrap">
+            <p class="score-label">Score</p>
+            <p class="score-big" id="score-display">—</p>
+          </div>
+
+          <div id="result-meta"></div>
+          <p id="save-status" class="sub"></p>
+
+          <p class="block-title" id="feedback-label">Your feedback</p>
+          <div class="feedback-section" id="ai-feedback"></div>
+          <p id="gemini-error-box" class="error-msg gemini-error-box" style="display: none"></p>
+
+          <details class="feedback-section optional-gemini" id="gemini-details">
+            <summary>Optional — extra tips via Google Gemini (free API key)</summary>
+            <p class="sub gemini-intro">
+              <strong>You can skip this.</strong> Feedback above is already complete. Gemini only rephrases tips — you need your own key from Google.
+            </p>
+            <ol class="gemini-steps">
+              <li>Open <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">Google AI Studio</a> while signed into Google.</li>
+              <li>Create an API key and copy the value (often starts with <code>AIza</code>).</li>
+              <li>Paste it below — it stays in this browser only.</li>
+            </ol>
+            <div id="gemini-key-panel">
+              <label for="gemini-key-input">API key</label>
+              <input
+                type="password"
+                id="gemini-key-input"
+                autocomplete="off"
+                spellcheck="false"
+                placeholder="Paste key here"
+              />
+              <div class="btn-row">
+                <button type="button" class="btn" id="gemini-key-save">Save key &amp; load Gemini tips</button>
+                <button type="button" class="btn btn-secondary" id="gemini-load-saved" hidden>
+                  Load Gemini again
+                </button>
+              </div>
+            </div>
+          </details>
+
+          <div class="nav-links">
+            <a class="btn" href="index.html">Take another test</a>
+            <a class="btn btn-secondary" href="dashboard.html">Teacher dashboard</a>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="site-footer" id="result-footer"></footer>
+
+    <script>
+      window.GEMINI_API_KEY_OVERRIDE = "";
+    </script>
+
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script src="js/results-store.js"></script>
+    <script src="js/gemini.js"></script>
+    <script src="js/result.js"></script>
+  </body>
+</html>
