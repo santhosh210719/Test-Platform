@@ -1,7 +1,115 @@
 /**
- * Gemini API — strengths, weaknesses, suggestions from test score.
+ * Gemini API — AI question generation + feedback from test score.
  * Uses REST: https://ai.google.dev/api/rest
  */
+
+/**
+ * Fetch 10 AI-generated MCQ questions for a given category.
+ * Tries gemini-2.5-flash first.
+ *
+ * @param {string} category
+ * @returns {Promise<Array<{ question: string, options: string[], correctIndex: number }>>}
+ */
+async function fetchAiQuestions(category) {
+  var apiKey = typeof getGeminiApiKey === "function" ? getGeminiApiKey() : "";
+  if (!apiKey || apiKey === "YOUR_GEMINI_API_KEY") {
+    throw new Error("GEMINI_KEY_MISSING");
+  }
+
+  var prompt =
+    "You are an exam question generator.\n" +
+    "Subject: " + category + "\n" +
+    "Generate exactly 10 multiple choice questions.\n" +
+    "Rules: medium difficulty, concept-based, 4 options each, 1 correct answer.\n" +
+    "Return ONLY a valid JSON array. No markdown. No explanation. No extra text.\n" +
+    "Format:\n" +
+    '[\n  { "question": "...", "options": ["A","B","C","D"], "answerIndex": 0 }\n]';
+
+  // using gemini-flash-latest to avoid quota issues with specific models
+  var url =
+    "https://generativelanguage.googleapis.com/v1beta/models/" +
+    "gemini-flash-latest:generateContent?key=" + encodeURIComponent(apiKey);
+
+  console.log("[Gemini] Calling gemini-2.5-flash...");
+
+  var res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      contents: [{ parts: [{ text: prompt }] }],
+      generationConfig: {
+        temperature: 0.7,
+        maxOutputTokens: 8192
+      }
+    })
+  });
+
+  if (!res.ok) {
+    var errBody = await res.text();
+    var errJson = {};
+    try { errJson = JSON.parse(errBody); } catch (_) {}
+    var msg = (errJson.error && errJson.error.message) || errBody;
+    throw new Error(msg);
+  }
+
+  var data = await res.json();
+  var rawText =
+    data.candidates &&
+    data.candidates[0] &&
+    data.candidates[0].content &&
+    data.candidates[0].content.parts &&
+    data.candidates[0].content.parts[0]
+      ? data.candidates[0].content.parts[0].text
+      : "";
+
+  if (!rawText) {
+    throw new Error("Gemini returned an empty response.");
+  }
+
+  console.log("[Gemini] Response length:", rawText.length, "chars");
+
+  // Strip markdown fences if present
+  var cleaned = rawText
+    .replace(/```json\s*/gi, "")
+    .replace(/```\s*/gi, "")
+    .trim();
+
+  // Extract the JSON array — find first [ and last ]
+  var start = cleaned.indexOf("[");
+  var end   = cleaned.lastIndexOf("]");
+  if (start !== -1 && end !== -1 && end > start) {
+    cleaned = cleaned.slice(start, end + 1);
+  }
+
+  var parsed;
+  try {
+    parsed = JSON.parse(cleaned);
+  } catch (e) {
+    console.error("[Gemini] Raw response:", cleaned.slice(0, 300));
+    throw new Error("Could not parse AI response as JSON. Please try again.");
+  }
+
+  if (!Array.isArray(parsed) || parsed.length === 0) {
+    throw new Error("AI returned no questions. Please try again.");
+  }
+
+  var questions = parsed.map(function (item, idx) {
+    var answerIdx =
+      typeof item.answerIndex  === "number" ? item.answerIndex :
+      typeof item.correctIndex === "number" ? item.correctIndex : 0;
+
+    if (!item.question || !Array.isArray(item.options)) {
+      throw new Error("Question #" + (idx + 1) + " has invalid structure.");
+    }
+    var opts = item.options.slice(0, 4);
+    while (opts.length < 4) opts.push("—");
+    return { question: item.question, options: opts, correctIndex: answerIdx };
+  });
+
+  console.log("[Gemini] ✅ Generated", questions.length, "questions successfully!");
+  return questions;
+}
+
 
 /**
  * @param {number} score - correct count
@@ -31,9 +139,9 @@ Suggestions:
 
 Keep language encouraging and specific to ${category}. No markdown code blocks.`;
 
-  // If this model is unavailable in your region, try: gemini-2.0-flash or gemini-1.5-flash-latest
+  // using gemini-flash-latest to avoid 404 errors
   const url =
-    "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" +
+    "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=" +
     encodeURIComponent(apiKey);
 
   const res = await fetch(url, {

@@ -9,15 +9,17 @@
  */
 
 // --- Replace with your Firebase web app config ---
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT.appspot.com",
-  messagingSenderId: "000000000000",
-  appId: "1:000000000000:web:xxxxxxxxxxxxxxxx",
+  apiKey: "AIzaSyCXvwaYQscgjE9zb_N3Tj6_JsfYN2pLqqQ",
+  authDomain: "database-7d1a6.firebaseapp.com",
+  projectId: "database-7d1a6",
+  storageBucket: "database-7d1a6.firebasestorage.app",
+  messagingSenderId: "54948304822",
+  appId: "1:54948304822:web:9a64e84e76d60aabb71317",
+  measurementId: "G-DKFV83J008"
 };
-
+console.log("Firebase connected");
 /**
  * Gemini API key — resolved each time (so localStorage works after save without reload).
  * Order: window.GEMINI_API_KEY_OVERRIDE → localStorage "geminiApiKey" → default placeholder.
@@ -36,7 +38,10 @@ function getGeminiApiKey() {
   } catch (e) {
     /* private mode / blocked storage */
   }
-  return "YOUR_GEMINI_API_KEY";
+  return "AIzaSyA-rXh6w7vrO0kO91_SgJoQe9wczUneDVg";
+
+
+
 }
 
 /** Simple gate for the teacher dashboard (change this). */

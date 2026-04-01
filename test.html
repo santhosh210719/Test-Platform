@@ -11,6 +11,51 @@
       <a href="index.html" class="topbar__brand">Interview Lab</a>
       <span class="topbar__meta">Timed MCQ · 10 questions</span>
     </header>
+    <!-- START EXAM OVERLAY - Matches your existing design -->
+<div id="start-exam-overlay" class="start-overlay">
+  <div class="start-overlay__card">
+    <div class="start-overlay__icon">📋</div>
+    <h2 class="start-overlay__title">Ready to begin?</h2>
+    <p class="start-overlay__subtitle">Follow these rules to take your exam</p>
+    
+    <div class="start-overlay__rules">
+      <div class="rule-item">
+        <span class="rule-icon">🖥️</span>
+        <div class="rule-content">
+          <strong>Fullscreen mode required</strong>
+          <span>You must stay in fullscreen throughout the exam</span>
+        </div>
+      </div>
+      <div class="rule-item">
+        <span class="rule-icon">📋</span>
+        <div class="rule-content">
+          <strong>Copy/paste disabled</strong>
+          <span>Copying and pasting is not allowed</span>
+        </div>
+      </div>
+      <div class="rule-item">
+        <span class="rule-icon">🚫</span>
+        <div class="rule-content">
+          <strong>Stay in exam window</strong>
+          <span>Switching tabs or windows will be recorded</span>
+        </div>
+      </div>
+      <div class="rule-item">
+        <span class="rule-icon">⚠️</span>
+        <div class="rule-content">
+          <strong>3 violations = termination</strong>
+          <span>Your exam will end if you exceed 3 violations</span>
+        </div>
+      </div>
+    </div>
+    
+    <button id="start-exam-btn" class="btn-start">
+      <span class="btn-start__text">Start Exam</span>
+      <span class="btn-start__icon">→</span>
+    </button>
+    <p class="start-overlay__footer">Your timer will start when you begin</p>
+  </div>
+</div>
 
     <main class="main">
       <div class="wrap">
@@ -25,7 +70,16 @@
             <span class="timer-bar__pill"
               >Time left <strong id="timer-display">15:00</strong></span
             >
+            <span class="timer-bar__pill" id="question-source" style="font-size:0.8em;opacity:0.8;"></span>
           </div>
+
+          <!-- AI loading spinner -->
+          <div id="ai-loading" style="display:none; flex-direction:column; align-items:center; justify-content:center; padding: 60px 20px; gap: 16px;">
+            <div style="width:48px;height:48px;border:4px solid rgba(255,255,255,0.2);border-top-color:#a78bfa;border-radius:50%;animation:spin 0.8s linear infinite;"></div>
+            <p style="margin:0;font-size:1rem;opacity:0.8;">🤖 Generating AI questions for you…</p>
+            <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+          </div>
+
 
           <form id="test-form">
             <div id="questions-container"></div>
@@ -39,7 +93,9 @@
 
     <footer class="site-footer">Need to leave? Your timer keeps running until you submit or time expires.</footer>
 
-    <script src="js/questions.js"></script>
-    <script src="js/test.js"></script>
+    <script src="js/firebase-config.js?v=5"></script>
+    <script src="js/gemini.js?v=5"></script>
+    <script src="js/questions.js?v=5"></script>
+    <script src="js/test.js?v=5"></script>
   </body>
 </html>
