@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Join a scheduled class test on dev-bees with Test ID and PIN." />
+    <title>dev-bees — Join scheduled test</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a href="index.html" class="topbar__brand" aria-label="dev-bees home">
+        <div class="topbar__logo" aria-hidden="true">
+          <svg width="26" height="26" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M32 6L48 15.2V33.8L32 43L16 33.8V15.2L32 6Z" stroke="currentColor" stroke-width="2" fill="rgba(255,255,255,0.25)"/>
+            <path d="M32 14L40 18.6V27.8L32 32.4L24 27.8V18.6L32 14Z" fill="currentColor" opacity="0.35"/>
+            <ellipse cx="32" cy="36" rx="14" ry="11" fill="currentColor"/>
+            <path d="M32 26v22M24 30h16M24 36h16M24 42h16" stroke="#fff" stroke-width="2" stroke-opacity="0.35"/>
+            <ellipse cx="22" cy="34" rx="7" ry="5" fill="#fff" fill-opacity="0.9" transform="rotate(-25 22 34)"/>
+            <ellipse cx="42" cy="34" rx="7" ry="5" fill="#fff" fill-opacity="0.9" transform="rotate(25 42 34)"/>
+            <circle cx="28" cy="33" r="2" fill="#1e293b"/>
+            <circle cx="36" cy="33" r="2" fill="#1e293b"/>
+          </svg>
+        </div>
+        <span>dev-bees</span>
+      </a>
+      <nav class="topbar__nav topbar__nav--links" aria-label="Primary">
+        <a href="index.html">Home</a>
+        <a href="ai-assessment.html">AI assessment</a>
+        <a href="ai-assessment.html">AI Interview</a>
+        <a href="join-test.html" aria-current="page">Join test</a>
+        <a href="dashboard.html">Dashboard</a>
+      </nav>
+    </header>
+
+    <main class="main">
+      <div class="wrap animate-in">
+        <div class="section-heading">
+          <h1 style="font-size: 1.85rem; margin-bottom: 0.5rem;">Join scheduled test</h1>
+          <p>Use the Test ID and PIN from your teacher, plus your student details.</p>
+        </div>
+
+        <div class="card">
+          <div class="card__lead">
+            <div class="card__icon" style="background: var(--accent); color: #fff; border: none;">📅</div>
+            <div>
+              <h2 style="font-size: 1.35rem;">Class test access</h2>
+              <p class="sub" style="margin-bottom: 0;">
+                Your name and register number are saved for this session and appear on results.
+              </p>
+            </div>
+          </div>
+
+          <form id="join-test-form">
+            <div class="form-group">
+              <label for="name">Full name</label>
+              <input type="text" id="name" name="name" autocomplete="name" required placeholder="e.g. Alex Kumar" />
+            </div>
+            <div class="form-group">
+              <label for="regNo">Register number</label>
+              <input type="text" id="regNo" name="regNo" required placeholder="e.g. 21CS001" />
+            </div>
+            <div class="join-test-grid">
+              <div>
+                <label for="testId">Test ID</label>
+                <input type="text" id="testId" placeholder="e.g. AB12CD" required maxlength="6" style="text-transform: uppercase;" />
+              </div>
+              <div>
+                <label for="testPassword">Access PIN</label>
+                <input type="password" id="testPassword" placeholder="4 digits" required maxlength="4" inputmode="numeric" />
+              </div>
+            </div>
+            <button type="submit" class="btn" style="width: 100%;">Join scheduled test</button>
+          </form>
+
+          <div class="nav-links" style="flex-wrap: wrap;">
+            <a class="link-quiet" href="ai-assessment.html">← Practice with AI assessment instead</a>
+            <a class="link-quiet" href="dashboard.html">Teacher dashboard →</a>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <strong>dev-bees</strong> — Scheduled tests &amp; AI practice
+    </footer>
+
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="js/firebase-config.local.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script src="js/firebase.js"></script>
+    <script src="js/student.js"></script>
+    <script src="js/login.js"></script>
+  </body>
+</html>

@@ -30,22 +30,46 @@
   }
 
   scoreEl.textContent = payload.score + " / " + payload.total;
+
+  const attemptBlock = document.getElementById("attempt-summary-block");
+  if (attemptBlock && typeof payload.attempted === "number" && typeof payload.notAttempted === "number") {
+    attemptBlock.style.display = "block";
+    var attNums = payload.attemptedQuestionNumbers || [];
+    var skipNums = payload.notAttemptedQuestionNumbers || [];
+    var detail =
+      (attNums.length ? "<strong>Answered:</strong> Q " + attNums.join(", Q ") + "<br>" : "") +
+      (skipNums.length ? "<strong>Skipped:</strong> Q " + skipNums.join(", Q ") : "");
+    if (!detail) detail = "All questions were reviewed in one-question mode.";
+    attemptBlock.innerHTML =
+      '<div class="test-stats-row" style="margin-bottom: 0.75rem;">' +
+      '<span class="test-stats-row__item test-stats-row__item--ok"><span aria-hidden="true">✅</span> Attempted: <strong>' +
+      payload.attempted +
+      "</strong></span>" +
+      '<span class="test-stats-row__item test-stats-row__item--no"><span aria-hidden="true">❌</span> Not attempted: <strong>' +
+      payload.notAttempted +
+      "</strong></span></div>" +
+      '<p class="sub" style="margin-bottom: 0; font-size: 0.9rem; line-height: 1.5;">' +
+      detail +
+      "</p>";
+  }
+
   metaEl.innerHTML =
-    "<p><strong>Name:</strong> " +
-    escapeHtml(payload.name) +
-    "</p>" +
-    "<p><strong>Register No:</strong> " +
-    escapeHtml(payload.regNo) +
-    "</p>" +
-    "<p><strong>Category:</strong> " +
-    escapeHtml(payload.category) +
-    "</p>" +
-    "<p><strong>Time taken:</strong> " +
-    escapeHtml(payload.timeTaken) +
-    "</p>" +
-    (payload.timedOut
-      ? "<p><em>Test ended automatically when time ran out.</em></p>"
-      : "");
+    "<div class='card--plain' style='background:var(--surface-2); padding:1.25rem; border-radius:var(--radius-sm); border:1px solid var(--border);'>" +
+    "<label style='margin-bottom:0.25rem;'>Candidate Name</label>" +
+    "<strong style='display:block; font-size:1.1rem;'>" + escapeHtml(payload.name) + "</strong>" +
+    "</div>" +
+    "<div class='card--plain' style='background:var(--surface-2); padding:1.25rem; border-radius:var(--radius-sm); border:1px solid var(--border);'>" +
+    "<label style='margin-bottom:0.25rem;'>Register Number</label>" +
+    "<strong style='display:block; font-size:1.1rem;'>" + escapeHtml(payload.regNo) + "</strong>" +
+    "</div>" +
+    "<div class='card--plain' style='background:var(--surface-2); padding:1.25rem; border-radius:var(--radius-sm); border:1px solid var(--border);'>" +
+    "<label style='margin-bottom:0.25rem;'>Category</label>" +
+    "<strong style='display:block; font-size:1.1rem;'>" + escapeHtml(payload.category) + "</strong>" +
+    "</div>" +
+    "<div class='card--plain' style='background:var(--surface-2); padding:1.25rem; border-radius:var(--radius-sm); border:1px solid var(--border);'>" +
+    "<label style='margin-bottom:0.25rem;'>Time Elapsed</label>" +
+    "<strong style='display:block; font-size:1.1rem;'>" + escapeHtml(payload.timeTaken) + "</strong>" +
+    "</div>";
 
   const alreadySaved = sessionStorage.getItem("resultSaved") === "1";
 
@@ -54,20 +78,17 @@
     var ok = saveResultLocally(payload);
     if (ok) {
       sessionStorage.setItem("resultSaved", "1");
-      statusEl.textContent =
-        reasonMsg ||
-        "Saved on this device only. Open the teacher dashboard in this same browser to see it.";
-      statusEl.style.color = "var(--success, #059669)";
+      statusEl.textContent = reasonMsg || "Saved to local storage (Teacher Dashboard access required).";
+      statusEl.style.color = "var(--success)";
     } else {
-      statusEl.textContent =
-        "Could not save (browser storage blocked?). Allow storage for this site.";
-      statusEl.style.color = "var(--danger, #dc2626)";
+      statusEl.textContent = "Local save failed. Please check browser permissions.";
+      statusEl.style.color = "var(--danger)";
     }
     return ok;
   }
 
   if (!alreadySaved && db) {
-    statusEl.textContent = "Saving result…";
+    statusEl.textContent = "Syncing results to cloud...";
     db.collection("students")
       .add({
         name: payload.name,
@@ -80,22 +101,17 @@
       })
       .then(function () {
         sessionStorage.setItem("resultSaved", "1");
-        statusEl.textContent = "Result saved to Firestore.";
-        statusEl.style.color = "var(--success, #059669)";
+        statusEl.textContent = "Successfully synced to cloud database.";
+        statusEl.style.color = "var(--success)";
       })
       .catch(function (err) {
         console.error(err);
-        persistLocally(
-          "Cloud save failed — saved on this device only. Teacher: use this same browser, or fix Firebase (config/rules). " +
-            err.message
-        );
+        persistLocally("Cloud sync failed. Saved locally. " + err.message);
       });
   } else if (!alreadySaved && !db) {
-    persistLocally(
-      "Firebase not configured — saved on this device only. Teacher dashboard on this same PC/browser will show it. Add js/firebase-config.js for cloud sync."
-    );
+    persistLocally("Standard local save active (Firebase not configured).");
   } else {
-    statusEl.textContent = "Result already saved for this session.";
+    statusEl.textContent = "Record already synchronized.";
   }
 
   function geminiConfigured() {

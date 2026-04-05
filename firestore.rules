@@ -6,5 +6,9 @@ service cloud.firestore {
     match /students/{docId} {
       allow read, write: if true;
     }
+    // Scheduled tests (teacher creates → student joins by Test ID + PIN)
+    match /tests/{docId} {
+      allow read, write: if true;
+    }
   }
 }

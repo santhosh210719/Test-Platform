@@ -1,7 +1,121 @@
 /**
- * Gemini API — strengths, weaknesses, suggestions from test score.
+ * Gemini API — AI question generation + feedback from test score.
  * Uses REST: https://ai.google.dev/api/rest
  */
+
+/**
+ * Fetch 10 AI-generated MCQ questions for a given category.
+ * Tries gemini-2.5-flash first.
+ *
+ * @param {string} category
+ * @returns {Promise<Array<{ question: string, options: string[], correctIndex: number }>>}
+ */
+async function fetchAiQuestions(category) {
+  var apiKey = typeof getGeminiApiKey === "function" ? getGeminiApiKey() : "";
+  if (!apiKey || apiKey === "YOUR_GEMINI_API_KEY") {
+    throw new Error("GEMINI_KEY_MISSING");
+  }
+
+  var prompt =
+    "You are an exam question generator.\n" +
+    "Subject: " + category + "\n" +
+    "Generate exactly 10 multiple choice questions.\n" +
+    "Rules: medium difficulty, concept-based, 4 options each, 1 correct answer.\n" +
+    "Return ONLY a valid JSON array. No markdown. No explanation. No extra text.\n" +
+    "Format:\n" +
+    '[\n  { "question": "...", "options": ["A","B","C","D"], "answerIndex": 0 }\n]';
+
+  var url = "https://api.groq.com/openai/v1/chat/completions";
+
+  console.log("[Groq] Calling llama3-70b...");
+
+  var res = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + apiKey
+    },
+    body: JSON.stringify({
+      model: "llama-3.1-8b-instant",
+      messages: [{ role: "user", content: prompt }],
+      temperature: 0.7
+    })
+  });
+
+  if (!res.ok) {
+    var errBody = await res.text();
+    var errJson = {};
+    try { errJson = JSON.parse(errBody); } catch (_) {}
+    var msg = (errJson.error && errJson.error.message) || errBody;
+    throw new Error(msg);
+  }
+
+  var data = await res.json();
+  var rawText =
+    data.choices &&
+    data.choices[0] &&
+    data.choices[0].message &&
+    data.choices[0].message.content
+      ? data.choices[0].message.content
+      : "";
+
+  if (!rawText) {
+    throw new Error("AI returned an empty response.");
+  }
+
+  console.log("[Groq] Response length:", rawText.length, "chars");
+
+  // Strip markdown fences if present
+  var cleaned = rawText
+    .replace(/```json\s*/gi, "")
+    .replace(/```\s*/gi, "")
+    .trim();
+
+  // Extract the JSON array — find first [ and last ]
+  var start = cleaned.indexOf("[");
+  var end   = cleaned.lastIndexOf("]");
+  if (start !== -1 && end !== -1 && end > start) {
+    cleaned = cleaned.slice(start, end + 1);
+  }
+
+  var parsed;
+  try {
+    parsed = JSON.parse(cleaned);
+  } catch (e) {
+    console.error("[Gemini] Raw response:", cleaned.slice(0, 300));
+    throw new Error("Could not parse AI response as JSON. Please try again.");
+  }
+
+  if (!Array.isArray(parsed) || parsed.length === 0) {
+    throw new Error("AI returned no questions. Please try again.");
+  }
+
+  var questions = parsed.map(function (item, idx) {
+    var answerIdx = 0;
+    if (typeof item.answerIndex === "number") {
+      answerIdx = item.answerIndex;
+    } else if (typeof item.correctIndex === "number") {
+      answerIdx = item.correctIndex;
+    } else if (item.answer) {
+      // Find matching index from string
+      const found = item.options.findIndex(o => 
+          o.trim().toLowerCase() === item.answer.trim().toLowerCase()
+      );
+      if (found !== -1) answerIdx = found;
+    }
+    
+    if (!item.question || !Array.isArray(item.options)) {
+      throw new Error("Question #" + (idx + 1) + " has invalid structure.");
+    }
+    var opts = item.options.slice(0, 4);
+    while (opts.length < 4) opts.push("—");
+    return { question: item.question, options: opts, correctIndex: answerIdx };
+  });
+
+  console.log("[Gemini] ✅ Generated", questions.length, "questions successfully!");
+  return questions;
+}
+
 
 /**
  * @param {number} score - correct count
@@ -31,21 +145,19 @@ Suggestions:
 
 Keep language encouraging and specific to ${category}. No markdown code blocks.`;
 
-  // If this model is unavailable in your region, try: gemini-2.0-flash or gemini-1.5-flash-latest
-  const url =
-    "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" +
-    encodeURIComponent(apiKey);
+  const url = "https://api.groq.com/openai/v1/chat/completions";
 
   const res = await fetch(url, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + apiKey
+    },
     body: JSON.stringify({
-      contents: [
-        {
-          parts: [{ text: prompt }],
-        },
-      ],
-    }),
+      model: "llama3-70b-8192",
+      messages: [{ role: "user", content: prompt }],
+      temperature: 0.5
+    })
   });
 
   if (!res.ok) {
@@ -55,12 +167,11 @@ Keep language encouraging and specific to ${category}. No markdown code blocks.`
 
   const data = await res.json();
   const text =
-    data.candidates &&
-    data.candidates[0] &&
-    data.candidates[0].content &&
-    data.candidates[0].content.parts &&
-    data.candidates[0].content.parts[0]
-      ? data.candidates[0].content.parts[0].text
+    data.choices &&
+    data.choices[0] &&
+    data.choices[0].message &&
+    data.choices[0].message.content
+      ? data.choices[0].message.content
       : "";
 
   return parseFeedbackText(text);
