@@ -1,0 +1,50 @@
+# OS Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Editor / IDE
+.vscode/
+.idea/
+*.suo
+*.user
+*.swp
+*.swo
+*~
+
+# ─────────────────────────────────────────────────
+# 🔐 SECRETS — NEVER COMMIT THESE
+# ─────────────────────────────────────────────────
+
+# Local Firebase + API key config (copy from firebase-config.local.example.js)
+js/firebase-config.local.js
+
+# Any .env files (if you add a Node/Python backend)
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
+.env.staging
+
+# ─────────────────────────────────────────────────
+# Node / NPM (if you add a build step)
+# ─────────────────────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+
+# Build output
+dist/
+build/
+.cache/
+
+# Firebase hosting cache
+.firebase/

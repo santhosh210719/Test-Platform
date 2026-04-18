@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>dev-bees — Teacher Dashboard</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a href="index.html" class="topbar__brand">
+        <div class="topbar__logo">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        </div>
+        <span>dev-bees</span>
+      </a>
+      <nav class="topbar__nav">
+        <span class="topbar__meta">Teacher Portal</span>
+      </nav>
+    </header>
+
+    <main class="main">
+      <div class="wrap wrap--wide animate-in">
+
+        <!-- ── PIN Gate ──────────────────────────────────────────────────── -->
+        <div class="card pin-card" id="teacher-gate" style="margin: 4rem auto; max-width: 480px;">
+          <div style="text-align: center; margin-bottom: 2.5rem;">
+            <div class="card__icon" style="margin: 0 auto 1.5rem; background: var(--accent-soft); color: var(--accent);">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </div>
+            <h1>Secure Access</h1>
+            <p class="sub">Please enter your PIN to manage assessments.</p>
+          </div>
+          
+          <form id="pin-form">
+            <div class="form-group">
+              <label for="teacher-pin">Administrative PIN</label>
+              <input
+                type="password"
+                id="teacher-pin"
+                autocomplete="current-password"
+                required
+                placeholder="••••"
+                style="text-align: center; font-size: 1.5rem; letter-spacing: 0.5em;"
+              />
+            </div>
+            <button type="submit" class="btn" style="width: 100%; height: 3.5rem;">Unlock Management Suite</button>
+          </form>
+          <div style="text-align: center; margin-top: 1.5rem;">
+            <a href="index.html" class="link-quiet">← Return to Student Portal</a>
+          </div>
+        </div>
+
+        <!-- ── Dashboard Panel ── -->
+        <div id="dashboard-panel" style="display: none">
+          <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2.5rem;">
+            <div>
+              <h1 style="margin-bottom: 0.25rem;">Portal Overview</h1>
+              <p class="sub" style="margin-bottom: 0;">Manage scheduled tests and review student performance.</p>
+            </div>
+            <div class="btn-row">
+                <a href="index.html" class="btn btn-secondary btn-sm">Home</a>
+                <button class="btn btn-danger btn-sm" onclick="location.reload()">Lock</button>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr; gap: 2rem;">
+            <!-- Create Test Card -->
+            <div class="card">
+              <div class="card__lead" style="margin-bottom: 1.5rem;">
+                <div class="card__icon" style="background: var(--accent-soft); color: var(--accent);">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+                </div>
+                <div>
+                  <h2 style="margin-bottom: 0.25rem;">Schedule New Assessment</h2>
+                  <p class="sub" style="margin-bottom: 0;">AI will automatically extract questions from your uploaded paper.</p>
+                </div>
+              </div>
+
+              <form id="create-scheduled-test-form">
+                <div id="create-test-error" class="error-msg" style="display: none; margin-bottom: 1.25rem; padding: 1rem 1.15rem; border-radius: var(--radius-sm); background: var(--danger-soft); border: 1px solid rgba(220, 38, 38, 0.35); color: var(--text);" role="alert"></div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                  <div class="form-group">
+                    <label for="test-title">Assessment Title</label>
+                    <input type="text" id="test-title" required placeholder="e.g. Midterm 2024">
+                  </div>
+                  <div class="form-group">
+                    <label for="test-duration">Duration (Minutes)</label>
+                    <input type="number" id="test-duration" required placeholder="30" min="1" max="180">
+                  </div>
+                </div>
+                
+                <div class="form-group">
+                  <label>Upload Question Paper (PDF/IMG)</label>
+                  <div class="pdf-dropzone" id="ocr-dropzone" role="button" tabindex="0" aria-label="Upload question paper">
+                    <div class="pdf-dropzone__icon">📄</div>
+                    <p class="pdf-dropzone__text">Click to upload or drag &amp; drop here</p>
+                    <p class="sub" id="ocr-file-hint" style="margin: 0; font-size: 0.875rem; color: var(--text-muted);">PDF (text or scan) · PNG · JPG · WebP</p>
+                    <input type="file" id="ocr-file-input" accept=".pdf,application/pdf,image/*" style="display:none" />
+                  </div>
+                </div>
+                
+                <div id="ocr-status" class="pdf-status" style="display:none; margin-bottom: 1.5rem; padding: 1rem; background: var(--surface-2); border-radius: var(--radius-sm); border: 1px solid var(--border);">
+                  <div class="loader" style="width: 24px; height: 24px; border-width: 2px;"></div>
+                  <span id="ocr-status-text" style="font-size: 0.9rem; font-weight: 500;">Processing paper...</span>
+                </div>
+
+                <button type="submit" id="create-test-btn" class="btn" style="width: 100%; height: 3.5rem;">
+                  Generate Scheduled Assessment
+                </button>
+              </form>
+
+              <!-- Success Card -->
+              <div id="test-created-success" style="display: none; margin-top: 2rem; padding: 1.5rem; background: var(--success-soft); border: 1px solid var(--success); border-radius: var(--radius-md);">
+                <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1rem;">
+                  <div style="color: var(--accent);"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+                  <h3 style="margin: 0; color: var(--text);">Assessment Created Successfully</h3>
+                </div>
+                <p class="sub" style="margin-bottom: 1rem; color: var(--text-dim); opacity: 0.9;">Provide these credentials to your students:</p>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                  <div style="background: rgba(0,0,0,0.2); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid rgba(255,255,255,0.1);">
+                    <label style="color: var(--text-dim); margin-bottom: 0.25rem;">TEST ID</label>
+                    <strong id="display-test-id" style="font-size: 1.5rem; display: block; color: var(--accent-light); letter-spacing: 0.1em;">-</strong>
+                  </div>
+                  <div style="background: rgba(0,0,0,0.2); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid rgba(255,255,255,0.1);">
+                    <label style="color: var(--text-dim); margin-bottom: 0.25rem;">ACCESS PIN</label>
+                    <strong id="display-test-pass" style="font-size: 1.5rem; display: block; color: var(--accent-light); letter-spacing: 0.1em;">-</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Management Results Card -->
+            <div class="card">
+              <div class="card__lead" style="margin-bottom: 1.5rem;">
+                <div class="card__icon" style="background: var(--surface-2); color: var(--text);">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </div>
+                <div>
+                  <h2 style="margin-bottom: 0.25rem;">Evaluation Records</h2>
+                  <p class="sub" style="margin-bottom: 0;">Comprehensive history of student assessment attempts.</p>
+                </div>
+              </div>
+
+              <div id="load-error" class="error-msg" style="display:none; margin-bottom: 1rem;"></div>
+              
+              <div class="table-wrap">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Candidate Name</th>
+                      <th>Register No</th>
+                      <th>Category</th>
+                      <th>Performance</th>
+                      <th>Submission Date</th>
+                    </tr>
+                  </thead>
+                  <tbody id="results-body">
+                    <!-- Data will be injected here -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div><!-- /dashboard-panel -->
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      Administrative access is monitored. Log out when finished.
+    </footer>
+
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="js/firebase-config.local.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script src="js/llm-client.js"></script>
+    <script src="js/results-store.js"></script>
+    <script src="js/pdf-parser.js"></script>
+    <!-- New Test Creation Scripts -->
+    <script src="js/firebase.js"></script>
+    <script src="js/ai.js"></script>
+    <script src="js/teacher.js"></script>
+    <script src="js/dashboard.js"></script>
+  </body>
+</html>
