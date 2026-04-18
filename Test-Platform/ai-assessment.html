@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Start an AI-generated practice assessment on dev-bees." />
+    <title>dev-bees — AI assessment</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a href="index.html" class="topbar__brand" aria-label="dev-bees home">
+        <div class="topbar__logo" aria-hidden="true">
+          <svg width="26" height="26" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M32 6L48 15.2V33.8L32 43L16 33.8V15.2L32 6Z" stroke="currentColor" stroke-width="2" fill="rgba(255,255,255,0.25)"/>
+            <path d="M32 14L40 18.6V27.8L32 32.4L24 27.8V18.6L32 14Z" fill="currentColor" opacity="0.35"/>
+            <ellipse cx="32" cy="36" rx="14" ry="11" fill="currentColor"/>
+            <path d="M32 26v22M24 30h16M24 36h16M24 42h16" stroke="#fff" stroke-width="2" stroke-opacity="0.35"/>
+            <ellipse cx="22" cy="34" rx="7" ry="5" fill="#fff" fill-opacity="0.9" transform="rotate(-25 22 34)"/>
+            <ellipse cx="42" cy="34" rx="7" ry="5" fill="#fff" fill-opacity="0.9" transform="rotate(25 42 34)"/>
+            <circle cx="28" cy="33" r="2" fill="#1e293b"/>
+            <circle cx="36" cy="33" r="2" fill="#1e293b"/>
+          </svg>
+        </div>
+        <span>dev-bees</span>
+      </a>
+      <nav class="topbar__nav topbar__nav--links" aria-label="Primary">
+        <a href="index.html">Home</a>
+        <a href="ai-assessment.html" aria-current="page">AI assessment</a>
+        <a href="ai-assessment.html">AI Interview</a>
+        <a href="join-test.html">Join test</a>
+        <a href="dashboard.html">Dashboard</a>
+      </nav>
+    </header>
+
+    <main class="main">
+      <div class="wrap animate-in">
+        <div class="section-heading">
+          <h1 style="font-size: 1.85rem; margin-bottom: 0.5rem;">AI interview practice</h1>
+          <p>Enter your details and topic. You’ll get a custom multiple-choice assessment.</p>
+        </div>
+
+        <div class="card">
+          <div class="card__lead">
+            <div class="card__icon" aria-hidden="true" style="background: var(--accent-soft); color: var(--accent);">✦</div>
+            <div>
+              <h2 style="font-size: 1.35rem;">Start AI assessment</h2>
+              <p class="sub" style="margin-bottom: 0;">
+                Questions are generated for your chosen category (requires Gemini API when no teacher PDF is set).
+              </p>
+            </div>
+          </div>
+
+          <form id="login-form">
+            <div class="form-group">
+              <label for="name">Full name</label>
+              <input type="text" id="name" name="name" autocomplete="name" required placeholder="e.g. Alex Kumar" />
+            </div>
+            <div class="form-group">
+              <label for="regNo">Register number</label>
+              <input type="text" id="regNo" name="regNo" required placeholder="e.g. 21CS001" />
+            </div>
+            <div class="form-group">
+              <label for="category">Assessment category</label>
+              <select id="category" name="category" required>
+                <option value="HTML">HTML5 &amp; Web Semantics</option>
+                <option value="CSS">CSS3 &amp; Modern Layouts</option>
+                <option value="JavaScript">JavaScript (ES6+)</option>
+                <option value="Aptitude">General Aptitude</option>
+              </select>
+            </div>
+            <button type="submit" class="btn" style="width: 100%;">
+              <span>Start assessment</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m-7-7l7 7-7 7"/></svg>
+            </button>
+          </form>
+
+          <div class="nav-links" style="flex-wrap: wrap;">
+            <a class="link-quiet" href="join-test.html">Have a class code? Join scheduled test →</a>
+            <a class="link-quiet" href="dashboard.html">Teacher dashboard →</a>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <strong>dev-bees</strong> — AI interview practice &amp; online tests
+    </footer>
+
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="js/firebase-config.local.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script src="js/firebase.js"></script>
+    <script src="js/login.js"></script>
+  </body>
+</html>

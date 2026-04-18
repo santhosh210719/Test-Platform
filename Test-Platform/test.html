@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>dev-bees — Assessment</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a href="index.html" class="topbar__brand">
+        <div class="topbar__logo">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        </div>
+        <span>dev-bees</span>
+      </a>
+      <nav class="topbar__nav">
+        <span class="topbar__meta">Assessment in progress</span>
+      </nav>
+    </header>
+
+    <!-- START EXAM OVERLAY -->
+    <div id="start-exam-overlay" class="start-overlay" style="position: fixed; inset: 0; z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 2rem;">
+      <div class="start-overlay__card animate-in" style="width: 100%; max-width: 560px; text-align: center;">
+        <div class="start-overlay__icon-wrap" aria-hidden="true">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <h2 class="start-overlay__title">Security checklist</h2>
+        <p class="sub" style="margin-bottom: 1.75rem;">Please follow these proctoring guidelines before you begin.</p>
+
+        <div class="start-overlay__rules" style="text-align: left;">
+          <div class="rule-item">
+            <div class="rule-icon">🛡️</div>
+            <div class="rule-content">
+              <strong>Strict proctoring</strong>
+              <span>Switching tabs or minimizing the window may be logged as a violation.</span>
+            </div>
+          </div>
+          <div class="rule-item">
+            <div class="rule-icon">🤖</div>
+            <div class="rule-content">
+              <strong>Face tracking</strong>
+              <span>Keep your face visible and centered in the camera feed.</span>
+            </div>
+          </div>
+          <div class="rule-item">
+            <div class="rule-icon">🔒</div>
+            <div class="rule-content">
+              <strong>Locked environment</strong>
+              <span>Some shortcuts (e.g. Ctrl+C, F12) are restricted during the session.</span>
+            </div>
+          </div>
+        </div>
+
+        <button id="start-exam-btn" class="btn" style="width: 100%; min-height: 3.25rem; font-size: 1rem;">
+          I understand — start assessment
+        </button>
+        <p style="margin-top: 1.25rem; font-size: 0.8125rem; color: var(--text-muted);">
+          By starting, you agree to the automated proctoring terms for this session.
+        </p>
+      </div>
+    </div>
+
+    <main class="main">
+      <div class="wrap wrap--test animate-in">
+        <div class="test-shell" id="test-shell">
+          <aside class="card card--flat test-palette-card test-palette-card--hidden" id="test-palette-aside" aria-label="Question palette">
+            <p class="test-palette__title">Questions</p>
+            <p class="test-palette__hint">Select a number to jump. Highlight shows your current question.</p>
+            <div class="question-palette" id="question-palette" role="tablist" aria-orientation="horizontal"></div>
+            <div class="test-palette__legend">
+              <span><span class="test-palette__dot test-palette__dot--current" aria-hidden="true"></span> Current</span>
+              <span><span class="test-palette__dot test-palette__dot--answered" aria-hidden="true"></span> Answered</span>
+              <span><span class="test-palette__dot" aria-hidden="true"></span> Not answered</span>
+            </div>
+          </aside>
+
+          <div class="test-shell__main">
+            <div class="card card--flat" id="test-root">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 1.75rem; flex-wrap: wrap;">
+                <div>
+                  <h1 style="margin-bottom: 0.25rem; font-size: 1.65rem;">Live assessment</h1>
+                  <p class="sub" style="margin-bottom: 0;">Use the palette or Next to move between questions. Submit before time runs out.</p>
+                </div>
+                <div id="camera-status-pill" style="padding: 0.35rem 0.75rem; background: var(--success-soft); color: var(--success); border-radius: var(--radius-full); font-size: 0.7rem; font-weight: 700; display: flex; align-items: center; gap: 0.45rem; border: 1px solid rgba(22, 163, 74, 0.35); white-space: nowrap;">
+                  <span style="width: 7px; height: 7px; background: var(--success); border-radius: 50%; display: inline-block;"></span>
+                  SECURE
+                </div>
+              </div>
+
+              <div class="timer-bar" id="timer-bar">
+                <div class="timer-bar__pill">
+                  <span>Topic</span>
+                  <strong id="category-label">—</strong>
+                </div>
+                <div class="timer-bar__pill">
+                  <span>Question</span>
+                  <strong id="question-counter">Q 1 / 1</strong>
+                </div>
+                <div class="timer-bar__pill" style="align-items: flex-end;">
+                  <span>Time left</span>
+                  <strong id="timer-display">15:00</strong>
+                </div>
+              </div>
+
+              <div class="test-stats-row" id="test-stats-row" aria-live="polite">
+                <span class="test-stats-row__item test-stats-row__item--ok"><span aria-hidden="true">✅</span> Attempted: <strong id="stat-attempted">0</strong></span>
+                <span class="test-stats-row__item test-stats-row__item--no"><span aria-hidden="true">❌</span> Not attempted: <strong id="stat-not-attempted">0</strong></span>
+              </div>
+
+              <div id="ai-loading" style="display:none; flex-direction:column; align-items:center; justify-content:center; padding: 3rem 1.5rem; gap: 1.25rem;">
+                <div class="loader"></div>
+                <div style="text-align: center;">
+                  <h3 style="font-size: 1.15rem;">Generating questions</h3>
+                  <p class="sub" style="margin-bottom: 0;">Preparing your assessment…</p>
+                </div>
+              </div>
+
+              <form id="test-form">
+                <div id="questions-container"></div>
+
+                <div id="test-summary-panel" class="test-summary-panel" hidden>
+                  <h2 class="test-summary-panel__title">Submit assessment?</h2>
+                  <p class="sub test-summary-panel__lead">Review attempted vs not attempted, then confirm to finish.</p>
+                  <div class="test-summary-panel__grid">
+                    <div class="test-summary-card test-summary-card--ok">
+                      <span class="test-summary-card__label">✅ Attempted</span>
+                      <strong class="test-summary-card__value" id="summary-attempted">0</strong>
+                    </div>
+                    <div class="test-summary-card test-summary-card--no">
+                      <span class="test-summary-card__label">❌ Not attempted</span>
+                      <strong class="test-summary-card__value" id="summary-not-attempted">0</strong>
+                    </div>
+                  </div>
+                  <div class="test-summary-panel__detail">
+                    <p class="test-summary-detail__line" id="summary-detail-attempted"></p>
+                    <p class="test-summary-detail__line" id="summary-detail-not-attempted"></p>
+                  </div>
+                  <div class="test-summary-panel__actions">
+                    <button type="button" class="btn btn-secondary" id="summary-back-btn">Back to test</button>
+                    <button type="submit" class="btn" id="summary-confirm-btn">Confirm &amp; finish</button>
+                  </div>
+                </div>
+
+                <div class="test-actions test-actions--pager" id="test-pager-actions" style="margin-top: 1.75rem; padding-top: 1.75rem; border-top: 1px solid var(--border);">
+                  <button type="button" class="btn btn-secondary" id="btn-prev-question" style="flex: 1; min-height: 2.85rem;">
+                    ← Previous
+                  </button>
+                  <button type="button" class="btn" id="btn-next-question" style="flex: 1; min-height: 2.85rem;">
+                    Next →
+                  </button>
+                  <button type="button" class="btn" id="btn-open-summary" style="flex: 1; min-height: 2.85rem; display: none;">
+                    Submit test
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <p>dev-bees · Secure assessment environment</p>
+    </footer>
+
+    <div id="camera-container" style="display:none;">
+      <video id="camera-feed" autoplay playsinline muted></video>
+      <div id="camera-status">Checking camera…</div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.11.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/blazeface"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="js/firebase-config.local.js"></script>
+    <script src="js/firebase-config.js?v=6"></script>
+    <script src="js/llm-client.js"></script>
+    <script src="js/firebase.js?v=9"></script>
+    <script src="js/gemini.js?v=6"></script>
+    <script src="js/questions.js?v=6"></script>
+    <script src="js/test.js?v=9"></script>
+  </body>
+</html>

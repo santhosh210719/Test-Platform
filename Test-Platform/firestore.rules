@@ -1,0 +1,14 @@
+rules_version = '2';
+
+// DEMO RULES — open read/write. Replace with Firebase Authentication + role checks for production.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /students/{docId} {
+      allow read, write: if true;
+    }
+    // Scheduled tests (teacher creates → student joins by Test ID + PIN)
+    match /tests/{docId} {
+      allow read, write: if true;
+    }
+  }
+}
